@@ -21,10 +21,11 @@ object ClientEventHandler {
         val player = event.playerPatch.original as LocalPlayer
         if (JetpackUtils.isFlying(player)) {
             val moveVec = player.input.moveVector
+            val realMoveVec = Vec2(moveVec.x * player.forward.x.toFloat(), moveVec.y * player.forward.z.toFloat())
             val deltaMovement = player.getDeltaMovementLerped(Minecraft.getInstance().partialTick)
             val deltaMovementXZ = Vec2(deltaMovement.x.toFloat(), deltaMovement.z.toFloat())
-            val cosAngle = moveVec.dot(deltaMovementXZ)
-            event.playerPatch.currentLivingMotion = if (moveVec.length() <= 0.2 || cosAngle < 0 || deltaMovementXZ.length() <= 0.1) {
+            val cosAngle = realMoveVec.dot(deltaMovementXZ) / (realMoveVec.length() * deltaMovementXZ.length())
+            event.playerPatch.currentLivingMotion = if (moveVec.length() <= 0.2 || cosAngle < -0.5 || deltaMovementXZ.length() <= 0.1) {
                 LivingMotions.CREATIVE_IDLE
             } else LivingMotions.CREATIVE_FLY
         }
